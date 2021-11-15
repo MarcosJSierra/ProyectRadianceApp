@@ -5,13 +5,9 @@
         <v-sheet height="100%" width="100%" min-width="50vh" color="rgba(0, 0, 0, 0.32)">
           <v-container fluid>
             <v-layout align-center justify-center wrap>
-              <v-card elevation="12" min-width="40vh" class="pa-6" width="120vh">
-                <h1 class="section-title text-center py-6">Perfil de Usuario</h1>
+              <v-card elevation="12" min-width="40vh" class="pa-3 ma-3" width="120vh">
+                <h1 class="section-title text-center">Perfil de Usuario</h1>
                 <v-card-text>
-                  <p class="description text-center pt-8 pb-4">
-                    Para el proceso de registro de tu cuenta, por favor ingresa los datos
-                    que se te solicitan a continuación.
-                  </p>
                   <v-form>
                     <h3 class="format">Datos personales</h3>
                     <v-text-field
@@ -47,92 +43,6 @@
                       v-model="editedItem.phoneNumber"
                     >
                     </v-text-field>
-                    <h3 class="format">Datos del usuario</h3>
-                    <v-text-field
-                      label="Usuario"
-                      placeholder="Usuario"
-                      name="username"
-                      prepend-inner-icon="mdi-account-circle"
-                      type="text"
-                      solo
-                      color="#F37154"
-                      v-model="editedItem.user"
-                    >
-                    </v-text-field>
-                    <v-text-field
-                      id="password"
-                      label="Contraseña"
-                      placeholder="Contraseña"
-                      name="password"
-                      prepend-inner-icon="mdi-lock"
-                      :type="showPassword ? 'text' : 'password'"
-                      solo
-                      color="#F37154"
-                      v-model="editedItem.password"
-                      :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                      @click:append="showPassword = !showPassword"
-                    ></v-text-field>
-                    <h3 class="format">Datos de la suscripción</h3>
-                    <v-row class="py-3">
-                      <v-autocomplete
-                        v-model="editedItem.subscriptionType"
-                        :items="suscriptionTypes"
-                        solo
-                        chips
-                        color="deep-orange lighten-3"
-                        item-text="name"
-                        return-object
-                      >
-                      </v-autocomplete>
-                    </v-row>
-                    <h3 class="format">Datos de pago</h3>
-                    <v-text-field
-                      label="Número de tarjeta crédito/débito"
-                      placeholder="XXXX XXXX XXXX XXXX"
-                      name="username"
-                      type="number"
-                      solo
-                      v-model="editedItem.card"
-                    >
-                    </v-text-field>
-                    <v-row>
-                      <v-col>
-                        <v-text-field
-                          label="Fecha de expiración"
-                          placeholder="MM/YY"
-                          name="username"
-                          type="text"
-                          solo
-                          v-model="editedItem.expirationDate"
-                        >
-                        </v-text-field>
-                      </v-col>
-                      <v-col>
-                        <v-text-field
-                          label="CVC"
-                          placeholder="CVC"
-                          name="username"
-                          type="text"
-                          solo
-                          v-model="editedItem.card"
-                        >
-                        </v-text-field>
-                      </v-col>
-                    </v-row>
-                    <h3 class="format">Términos y Condiciones</h3>
-                    <v-card elevation="0">
-                      <v-radio value="Radianacer" class="p-2">
-                        <template v-slot:label>
-                          <div>
-                            <p class="pa-2">
-                              He leído y acepto los términos y condiciones que se
-                              encuentran
-                              <a href="hola.html">Términos y Condiciones</a>.
-                            </p>
-                          </div>
-                        </template>
-                      </v-radio>
-                    </v-card>
                   </v-form>
                 </v-card-text>
                 <v-card-actions>
@@ -145,33 +55,135 @@
                         dark
                         x-large
                         :loading="loading"
-                        >Finalizar</v-btn
+                        >Actualizar</v-btn
                       >
                     </v-col>
                   </v-row>
                 </v-card-actions>
-                <div>
-                  <v-alert
-                    v-model="alert"
-                    :value="alert_active"
-                    :color="alert_color"
-                    :icon="
-                      alert_color == 'success' ? 'mdi-check-circle' : 'mdi-alert-circle'
-                    "
-                    dense
-                    text
-                    dismissible
-                    border="left"
-                    transition="scroll-y-transition"
-                  >
-                    {{ alert_message }}</v-alert
-                  >
-                </div>
+                <v-card-text>
+                  <h3 class="format">Otros datos</h3>
+                  <v-container>
+                        <v-simple-table>
+                          <template v-slot:default>
+                            <thead>
+                              <tr>
+                                <th class="text-center">Propiedad</th>
+                                <th class="text-center">Valor</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td class="text-center">{{ "Usuario" }}</td>
+                                <td class="text-center">{{ editedItem.user }}</td>
+                              </tr>
+                              <tr>
+                                <td class="text-center">{{ "Rol Actual" }}</td>
+                                <td class="text-center">{{ editedItem.role }}</td>
+                              </tr>
+                            </tbody>
+                          </template>
+                        </v-simple-table>
+                      </v-container>
+                      <h3 class="format">Detalles de suscripción</h3>
+                      <v-container>
+                        <v-simple-table>
+                          <template v-slot:default>
+                            <tbody>
+                              <tr>
+                                <td class="text-center">{{ "Fecha de finalización" }}</td>
+                                <td class="text-center">{{ editedItem.subscription.finalizationDate }}</td>
+                              </tr>
+                              <tr>
+                                <td class="text-center">{{ "Suscripción actual" }}</td>
+                                <td class="text-center">
+                                  {{ editedItem.subscription.subscriptionType.name }}
+                                </td>
+                              </tr>
+                              <tr>
+                                <td class="text-center">{{ "Precio de suscripción" }}</td>
+                                <td class="text-center">
+                                  {{ "$"
+                                  }}{{ editedItem.subscription.subscriptionType.price }}
+                                </td>
+                              </tr>
+                            </tbody>
+                          </template>
+                        </v-simple-table>
+                      </v-container>
+                </v-card-text>
+              </v-card>
+              <v-card elevation="12" min-width="40vh" class="pa-3 ma-3" width="120vh">
+                <h1 class="section-title text-center">Cambio de contraseña</h1>
+                <v-card-text>
+                  <v-form>
+                    <h3 class="format">Contraseña actual</h3>
+                    <v-text-field
+                      id="password"
+                      label="Contraseña"
+                      placeholder="Contraseña"
+                      name="password"
+                      prepend-inner-icon="mdi-lock"
+                      type="password"
+                      solo
+                      color="#F37154"
+                      v-model="recover.oldPassword"
+                    ></v-text-field>
+                    <h3 class="format">Nueva contraseña</h3>
+                    <v-text-field
+                      label="Contraseña"
+                      placeholder="Contraseña"
+                      name="password"
+                      prepend-inner-icon="mdi-lock"
+                      :type="showPassword ? 'text' : 'password'"
+                      solo
+                      color="#F37154"
+                      v-model="recover.newPassword"
+                      :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                      @click:append="showPassword = !showPassword"
+                    ></v-text-field>
+                  </v-form>
+                </v-card-text>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-row align="center" justify="space-around" class="pb-12">
+                    <v-col>
+                      <v-btn
+                        @click="changePassword(recover)"
+                        color="grey darken-4"
+                        dark
+                        x-large
+                        :loading="loading"
+                        >Cambiar contraseña</v-btn
+                      >
+                    </v-col>
+                  </v-row>
+                </v-card-actions>
                 <div v-if="newRegister" class="pt-12 pb-6">
                   <v-row align="center" justify="center">
                     <v-btn color="grey darken-4" dark x-large to="/login">Login</v-btn>
                   </v-row>
                 </div>
+              </v-card>
+              <v-card elevation="12" min-width="40vh" class="pa-3 ma-3" width="120vh">
+                <h1 class="section-title text-center">Historial de Pagos</h1>
+                <v-container>
+                  <v-simple-table>
+                    <template v-slot:default>
+                      <thead>
+                        <tr>
+                          <th class="text-center">Monto</th>
+                          <th class="text-center">Fecha</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="(item, index) in historyItem" :key="index">
+                          <td class="text-center">{{ item.amount }}</td>
+                          <td class="text-center">{{ item.date }}</td>
+                        </tr>
+                      </tbody>
+                    </template>
+                  </v-simple-table>
+                </v-container>
               </v-card>
             </v-layout>
           </v-container>
@@ -183,10 +195,12 @@
 
 <script>
 import axios from "axios";
+import store from "../../store/index";
 
 export default {
   name: "Profile",
   data: () => ({
+    username: store.getters["username"],
     editedItem: {
       userId: "",
       name: "",
@@ -197,8 +211,23 @@ export default {
       user: "",
       password: "",
       isVerified: "",
-      subscriptionType: null,
+      subscription: {
+        finalizationDate: "",
+        status: "",
+        subscriptionType: {
+          subscriptionTypeId: "",
+          description: "",
+          name: "",
+          price: "",
+        },
+      },
     },
+    recover: {
+      oldPassword: "",
+      newPassword: "",
+    },
+    historyItem: {},
+    defaultHisitoryItem: null,
     showPassword: false,
     loading: false,
     suscriptionTypes: [],
@@ -228,75 +257,125 @@ export default {
 
     initialize() {
       this.loading = true;
-      axios.get("subscriptiontype/").then((response) => {
-        if (response.status == 200) {
-          this.suscriptionTypes = response.data;
-        } else {
-          console.log(response.status);
-        }
-      });
+      axios
+        .get("user/" + this.username)
+        .then((response) => {
+          if (response.status == 200) {
+            this.editedItem = response.data;
+            axios
+              .get("payment/" + this.editedItem.userId)
+              .then((res) => {
+                if (res.status == 200) {
+                  this.historyItem = res.data;
+                }
+              })
+              .catch((error) => {
+                let alert = {
+                  alert: true,
+                  alert_active: true,
+                  alert_message:
+                    "Hubo un error al obtener el historial de pagos. Intenta de nuevo más tarde.",
+                  alert_color: "error",
+                };
+                this.$emit("chanceAlert", alert);
+              });
+          }
+        })
+        .catch((error) => {
+          let alert = {
+            alert: true,
+            alert_active: true,
+            alert_message: "Hubo un error al obtener los datos del usuario.",
+            alert_color: "error",
+          };
+          this.$emit("chanceAlert", alert);
+        });
 
       this.loading = false;
     },
 
-    registerUser(item) {
+    registerUser() {
+      console.log(this.editedItem.subscription.subscriptionType);
       this.loading = true;
       let json = {
-        name: item.name,
-        mail: item.mail,
-        phoneNumber: item.phoneNumber,
-        role: "",
-        image: "",
-        user: item.user,
-        password: item.password,
-        isVerified: "",
+        userId: this.editedItem.userId,
+        name: this.editedItem.name,
+        mail: this.editedItem.mail,
+        phoneNumber: this.editedItem.phoneNumber,
+        role: this.editedItem.role,
+        image: this.editedItem.image,
+        user: this.editedItem.user,
+        password: this.editedItem.password,
+        isVerified: this.editedItem.isVerified,
         subscription: {
-          finalizationDate: "",
-          status: "",
+          finalizationDate: this.editedItem.subscription.finalizationDate,
+          status: this.editedItem.subscription.status,
           subscriptionType: {
-            subscriptionTypeId: item.subscriptionType.subscriptionTypeId,
-            name: item.subscriptionType.name,
-            price: item.subscriptionType.price,
-            description: item.subscriptionType.description,
-          },
+            subscriptionTypeId: this.editedItem.subscription.subscriptionType.subscriptionTypeId,
+            description: this.editedItem.subscription.subscriptionType.description,
+            name: this.editedItem.subscription.subscriptionType.name,
+            price: this.editedItem.subscription.subscriptionType.price,
+          }
         },
       };
       axios
-        .post("user/", json)
+        .put("user/" + this.editedItem.userId, json)
         .then((response) => {
           if (response.status == 200) {
             this.loading = false;
-            this.setAlert(
-              true,
-              "success",
-              "Tu cuenta ha sido creada éxitosamente. Para disfrutar de Radiance, procede a iniciar sesión."
-            );
             this.newRegister = true;
+            let alert = {
+              alert: true,
+              alert_active: true,
+              alert_message: "Tu cuenta ha sido actualizada éxitosamente.",
+              alert_color: "success",
+            };
+            this.$emit("chanceAlert", alert);
           }
         })
         .catch((error) => {
-          //406 , faltan campos
-          //409 , username ya existe
-          //400 , algo salio mal
-          this.newRegister = false;
-          if (error.response.status == 409) {
-            this.setAlert(
-              true,
-              "error",
-              "El usuario que intentas registrar ya existe. Por favor, ingresa otro usuario."
-            );
-          }
-          if (error.response.status == 406) {
-            this.setAlert(true, "error", "Faltan datos para completar el registro.");
-          }
-          if (error.response.status == 400) {
-            this.setAlert(
-              true,
-              "error",
-              "Algo salió mal durante la creación de tu cuenta. Por favor, vuelve a intentarlo más tarde."
-            );
-          }
+          let alert = {
+              alert: true,
+              alert_active: true,
+              alert_message: "Algo salió mal durante la actualización de tu cuenta. Por favor, vuelve a intentarlo más tarde.",
+              alert_color: "error",
+            };
+            this.$emit("chanceAlert", alert);
         });
+      this.alert = true;
+      this.loading = false;
+    },
+    changePassword(recover) {
+      let json = {
+        password: recover.oldPassword,
+        newPassword: recover.newPassword,
+      };
+      axios
+        .put("changepassword/", json)
+        .then((response) => {
+          if (response.status == 200) {
+            this.loading = false;
+            let alert = {
+              alert: true,
+              alert_active: true,
+              alert_message: "Tu contraseña ha sido actualizada éxitosamente.",
+              alert_color: "success",
+            };
+            this.$emit("chanceAlert", alert);
+          }
+        })
+        .catch((error) => {
+          let alert = {
+            alert: true,
+            alert_active: true,
+            alert_message:
+              "Hubo un error al actualizar tu contraseña. Por favor, intenta más tarde.",
+            alert_color: "error",
+          };
+          this.$emit("chanceAlert", alert);
+        });
+      this.recover.oldPassword = "";
+      this.recover.newPassword = "";
       this.alert = true;
       this.loading = false;
     },
@@ -312,7 +391,7 @@ export default {
 
 <style>
 h1.section-title {
-  font-size: 48px !important;
+  font-size: 35px !important;
   color: #212121;
   font-family: "Noto Serif" !important;
   font-weight: 600 !important;
@@ -326,7 +405,7 @@ p.description {
 h3.format {
   font-family: "Montserrat" !important;
   font-size: 18px !important;
-  margin: 32px 0px !important;
+  margin: 16px 0px !important;
   color: #8a8a8a !important;
   font-weight: 500 !important;
 }

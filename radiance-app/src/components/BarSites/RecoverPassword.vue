@@ -15,40 +15,31 @@
                   <v-spacer />
                 </v-toolbar>
                 <v-card-text>
+                    <v-container>
                   <v-row justify="space-around" class="py-10">
-                    <p id="login_title">Login</p>
+                    <p id="login_title">Recuperación de contraseña</p>
+                    
                   </v-row>
+                  <v-row justify="center">
+                  <p>Escribe el correo que registraste en tu cuenta. </p>
+                  
+                  </v-row>
+                  <v-row justify="center">
+                  <p>Enviaremos un correo a esta dirección con instrucciones a seguir.</p>
+                  </v-row>
+                  </v-container>
                   <v-form class="px-3">
                     <v-text-field
-                      label="Usuario"
-                      placeholder="Usuario"
-                      name="username"
-                      prepend-inner-icon="mdi-account-circle"
-                      type="text"
+                      label="Correo electrónico"
+                      placeholder="Correo electrónico"
+                      name="mail"
+                      prepend-inner-icon="mdi-at"
+                      type="email"
                       solo
                       color="#F37154"
-                      v-model="user.username"
+                      v-model="editedItem.mail"
                       class="py-3"
-                    >
-                    </v-text-field>
-                    <v-text-field
-                      :type="showPassword ? 'text' : 'password'"
-                      id="password"
-                      label="Contraseña"
-                      placeholder="Contraseña"
-                      name="password"
-                      solo
-                      color="#F37154"
-                      v-model="user.password"
-                      class="py-3"
-                      prepend-inner-icon="mdi-lock"
-                      :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                      @click:append="showPassword = !showPassword"
                     ></v-text-field>
-                    <p >
-                      Olvidaste tu contraseña
-                      <a href="/recoverPassword">Recupera tu contraseña</a>.
-                    </p>
                     <div>
                       <v-alert
                         v-model="alert"
@@ -80,7 +71,7 @@
                         x-large
                         :loading="loading"
                         @click="logIn"
-                        >Ingresar</v-btn
+                        >Enviar</v-btn
                       >
                     </v-col>
                   </v-row>
@@ -113,10 +104,8 @@ export default {
     alert_color: "",
     alert_icon: "",
     loading: false,
-    showPassword: false,
-    user: {
-      username: "",
-      password: "",
+    editedItem: {
+      mail: "",
     },
   }),
   computed: {
@@ -136,30 +125,22 @@ export default {
 
     logIn() {
       this.loading = true;
-      let json = {
-        username: this.user.username,
-        password: this.user.password,
-      };
+      let mail = this.editedItem.mail;
 
       axios
-        .post("login/", json)
+        .get("recoverpassword/", {params: {
+            mail
+        }})
         .then((response) => {
           if (response.status == 200) {
-            this.setAlert(true, "success", "Bienvenido a Radiance.");
+            this.setAlert(true, "success", "Correo enviado exitosamente.");
             this.alert = true;
-            let payload = {
-              accessToken: response.data.accessToken,
-              role: response.data.role,
-              username: json.username,
-            };
             this.loading = false;
-            store.dispatch("logIn", payload);
           }
         })
         .catch((error) => {
-          this.setAlert(true, "error", "Usuario o contraseña incorrectos.");
+          this.setAlert(true, "error", "Error al enviar correo.");
           this.alert = true;
-          store.dispatch("clearUserData");
           this.loading = false;
         });
     },

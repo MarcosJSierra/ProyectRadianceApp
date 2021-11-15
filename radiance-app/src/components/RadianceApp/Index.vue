@@ -130,7 +130,7 @@ export default {
       { title: "Usuarios", icon: "mdi-account-multiple", path: "/radiance/users" },
       { title: "Pagos", icon: "mdi-wallet", path: "/radiance/payments" },
       { title: "Suscripciones", icon: "mdi-format-list-checks", path: "/radiance/suscriptions" },
-      { title: "Reportes", icon: "mdi-chart-tree", path: "/radiance/reports" },
+      //{ title: "Reportes", icon: "mdi-chart-tree", path: "/radiance/reports" },
     ],
     itemsEditor: [
       { title: "Tags", icon: "mdi-tag", path: "/radiance/tags" },

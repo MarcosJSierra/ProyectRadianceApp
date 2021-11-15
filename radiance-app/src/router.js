@@ -2,9 +2,9 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import MainWebSite from "./components/MainWebSite.vue";
 import Login from "./components/BarSites/Login.vue";
+import Recover from "./components/BarSites/Recover.vue";
 import Register from "./components/BarSites/Register.vue";
 import Contact from "./components/BarSites/Contact.vue";
-import Main from "./components/RadianceApp/Main.vue";
 import Index from "./components/RadianceApp/Index.vue";
 import store from "./store";
 
@@ -19,6 +19,11 @@ const routes = [
     path: "/login",
     name: "Login",
     component: Login,
+  },
+  {
+    path: "/recoverPassword",
+    name: "Recover",
+    component: Recover,
   },
   {
     path: "/register",
@@ -99,6 +104,15 @@ const routes = [
         meta: {
           requiresAuth: true,
           accessLevel:1
+        },
+      },
+      {
+        name: 'Home',
+        path: 'home/',
+        component: () => import('@/components/RadianceApp/Home'),
+        meta: {
+          requiresAuth: true,
+          accessLevel: 1
         },
       },
     ]

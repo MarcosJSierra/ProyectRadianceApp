@@ -76,9 +76,6 @@
                         v-model="editedItem.image"
                       >
                       </v-text-field>
-                       <v-container>
-                          <v-img :src=editedItem.image></v-img>
-                      </v-container>
                       <v-subheader>Agregar tags al artículo</v-subheader>
                       <v-autocomplete
                         v-model="editedItem.tags"
@@ -105,7 +102,7 @@
                             {{ data.item.name }}
                           </v-chip>
                         </template>
-                        <template  v-slot:item="data">
+                        <template v-slot:item="data">
                           <template v-if="typeof data.item !== 'object'">
                             <v-list-item-content v-text="data.item"></v-list-item-content>
                           </template>
@@ -137,7 +134,46 @@
                         v-model="editedItem.content"
                       >
                       </v-textarea>
-                      <span v-html="editedItem.content"></span>
+                    </v-container>
+                    <v-container>
+                      <v-subheader>Vista previa del articulo</v-subheader>
+                      <v-divider></v-divider>
+                      <v-card>
+                        <v-container>
+                          <v-img :src="editedItem.image" width="1000px"></v-img>
+                          <h2 class="section-title px-3 pt-3">
+                            {{ editedItem.tittle }}
+                          </h2>
+                          <v-card-text>
+                            <v-chip-group>
+                              <v-chip
+                                v-for="(tag, index) in editedItem.tags"
+                                :key="index"
+                                :value="tag.tagId"
+                                dark
+                              >
+                                <v-avatar left>
+                                  <v-icon :color="tag.color">{{ tag.icon }}</v-icon>
+                                </v-avatar>
+                                {{ tag.name }}
+                              </v-chip>
+                            </v-chip-group>
+                            <p class="text ma-0">
+                              {{ "Fecha de creación: " }}{{ editedItem.creationDate }}
+                            </p>
+                            <p class="text">
+                              {{ "Escrito por: " }}{{ editedItem.user.name }}
+                            </p>
+                            <p class="description">{{ editedItem.description }}</p>
+                          </v-card-text>
+                        </v-container>
+                        <v-divider></v-divider>
+                        <v-container>
+                          <v-card elevation="0">
+                            <span v-html="editedItem.content"></span>
+                          </v-card>
+                        </v-container>
+                      </v-card>
                     </v-container>
                   </v-card-text>
 
@@ -198,7 +234,7 @@ import store from "../../store/index";
 export default {
   name: "Tags",
   data: () => {
-    return ({
+    return {
       loading: true,
       dialog: false,
       dialogDelete: false,
@@ -209,7 +245,12 @@ export default {
           align: "center",
           value: "tittle",
         },
-        { text: "Fecha de modificación", align: "center", value: "lastModifyDate", sortable: false },
+        {
+          text: "Fecha de modificación",
+          align: "center",
+          value: "lastModifyDate",
+          sortable: false,
+        },
         { text: "Creado por", align: "center", value: "user.name", sortable: false },
         { text: "Actions", align: "center", value: "actions", sortable: false },
       ],
@@ -238,7 +279,7 @@ export default {
         image: "",
         tags: [],
       },
-    });
+    };
   },
 
   computed: {
@@ -287,6 +328,8 @@ export default {
     },
 
     getArticles() {
+      if(this.role == "Administrador") {
+        console.log("get general de articulos");
         axios
         .get("article/")
         .then((response) => {
@@ -306,6 +349,29 @@ export default {
           };
           this.$emit("chanceAlert", alert);
         });
+      } else {
+        console.log("get de owner");
+        axios
+        .get("article/", {params: {own: true}})
+        .then((response) => {
+          if (response.status == 200) {
+            this.articles = response.data;
+          } else {
+            console.log(response.status);
+          }
+        })
+        .catch((error) => {
+          console.log(response.status);
+          let alert = {
+            alert: true,
+            alert_active: true,
+            alert_message: "No se pudo obtener la lista de artículos",
+            alert_color: "error",
+          };
+          this.$emit("chanceAlert", alert);
+        });
+      }
+      
     },
 
     editItem(item) {
@@ -322,25 +388,29 @@ export default {
 
     deleteItemConfirm(articleId) {
       this.loading = true;
-      axios.delete("article/" + articleId).then((response) => {
-        if (response.status == 200) {
-          this.articles.splice(this.editedIndex, 1);
+      axios
+        .delete("article/" + articleId)
+        .then((response) => {
+          if (response.status == 200) {
+            this.articles.splice(this.editedIndex, 1);
+            this.loading = false;
+            let alert = {
+              alert: true,
+              alert_active: true,
+              alert_message: "Artículo eliminado correctamente.",
+              alert_color: "success",
+            };
+            this.$emit("chanceAlert", alert);
+            this.closeDelete();
+          }
+        })
+        .catch((error) => {
           this.loading = false;
           let alert = {
             alert: true,
             alert_active: true,
-            alert_message: "Artículo eliminado correctamente.",
-            alert_color: "success",
-          };
-          this.$emit("chanceAlert", alert);
-          this.closeDelete();
-        }
-      }).catch((error) => {
-          this.loading = false;
-          let alert = {
-            alert: true,
-            alert_active: true,
-            alert_message: "Algo salió mal durante la eliminación del artículo. Por favor, vuelve a intentarlo más tarde.",
+            alert_message:
+              "Algo salió mal durante la eliminación del artículo. Por favor, vuelve a intentarlo más tarde.",
             alert_color: "error",
           };
           this.$emit("chanceAlert", alert);
@@ -374,35 +444,32 @@ export default {
           image: item.image,
           tags: item.tags,
         };
-        axios.post("article/", json).then((response) => {
-          if (response.status == 200) {
-            /* this.editedItem.articleId = response.data.articleId;
-            if (this.editedIndex > -1) {
-              Object.assign(this.articles[this.editedIndex], this.editedItem);
-            } else {
-              this.articles.push(this.editedItem);
-            } */
-            this.loading = false;
+        axios
+          .post("article/", json)
+          .then((response) => {
+            if (response.status == 200) {
+              this.loading = false;
+              let alert = {
+                alert: true,
+                alert_active: true,
+                alert_message: "Artículo creado correctamente.",
+                alert_color: "success",
+              };
+              this.$emit("chanceAlert", alert);
+              this.close();
+            }
+          })
+          .catch((error) => {
             let alert = {
               alert: true,
               alert_active: true,
-              alert_message: "Artículo creado correctamente.",
-              alert_color: "success",
-            };
-            this.$emit("chanceAlert", alert);
-
-            this.close();
-          }
-        }).catch((error) => {
-            let alert = {
-              alert: true,
-              alert_active: true,
-              alert_message: "Algo salió mal durante la creación del artículo. Por favor, vuelve a intentarlo más tarde.",
+              alert_message:
+                "Algo salió mal durante la creación del artículo. Por favor, vuelve a intentarlo más tarde.",
               alert_color: "error",
             };
             this.$emit("chanceAlert", alert);
             this.close();
-        })
+          });
       } else {
         this.loading = true;
         let json = {
@@ -416,42 +483,61 @@ export default {
           image: item.image,
           tags: item.tags,
         };
-        axios.put("article/" + json.articleId, json).then((response) => {
-          if (response.status == 200) {
-            /* this.editedItem.articleId = response.data.articleId;
-            if (this.editedIndex > -1) {
-              Object.assign(this.articles[this.editedIndex], this.editedItem);
-            } else {
-              this.articles.push(this.editedItem);
-            } */
-            this.loading = false;
+        axios
+          .put("article/" + json.articleId, json)
+          .then((response) => {
+            if (response.status == 200) {
+              this.loading = false;
+              let alert = {
+                alert: true,
+                alert_active: true,
+                alert_message: "Artículo editado correctamente.",
+                alert_color: "success",
+              };
+              this.$emit("chanceAlert", alert);
+              this.close();
+            }
+          })
+          .catch((error) => {
             let alert = {
               alert: true,
               alert_active: true,
-              alert_message: "Artículo editado correctamente.",
-              alert_color: "success",
-            };
-            this.$emit("chanceAlert", alert);
-            this.close();
-          }
-        }).catch((error) => {
-            let alert = {
-              alert: true,
-              alert_active: true,
-              alert_message: "Algo salió mal durante la actualización del artículo. Por favor, vuelve a intentarlo más tarde.",
+              alert_message:
+                "Algo salió mal durante la actualización del artículo. Por favor, vuelve a intentarlo más tarde.",
               alert_color: "error",
             };
             this.$emit("chanceAlert", alert);
             this.close();
-        })
+          });
       }
       this.getArticles();
     },
   },
 };
 </script>
+
 <style>
-.card-title {
-  padding: 0px 0px;
+h2.section-title {
+  font-size: 25px !important;
+  color: #212121 !important;
+  font-family: "Montserrat" !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+}
+h3.item-title {
+  color: #212121 !important;
+  font-family: "Montserrat" !important;
+  font-weight: bold !important;
+}
+
+p.description {
+  font-family: "Montserrat" !important;
+  font-size: 18px !important;
+  color: #212121 !important;
+}
+p.text {
+  font-family: "Montserrat" !important;
+  font-size: 13px !important;
+  color: #212121 !important;
 }
 </style>

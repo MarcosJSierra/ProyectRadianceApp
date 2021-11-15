@@ -66,7 +66,7 @@ export default new Vuex.Store({
       commit("setExpandSideBar", true);
       commit("setLoginError", "200");
       commit("setRole", payload.role);
-      router.push("/radiance");
+      router.push("/radiance/home");
       
  
     },
